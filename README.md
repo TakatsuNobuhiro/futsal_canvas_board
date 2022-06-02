@@ -1,4 +1,11 @@
 # futsal_canvas_board
+リアルタイムで駒を動かせるフットサル戦術ボード
+
+## 使用技術
+- firebase (real-time)
+- nuxt2(nuxt-property-decorator)
+- typescript
+- githubActions
 
 ## Build Setup
 
