@@ -49,6 +49,7 @@ export default class Board extends Vue {
   mouseDown (event: any) {
     let mouseX = event.clientX / this.scale
     let mouseY = event.clientY / this.scale
+
     // マウスがオブジェクト上にあるか判定
     if ((this.objX - this.objRadius < mouseX && mouseX< this.objX + this.objRadius)
       &&(this.objY - this.objRadius < mouseY && this.objY + this.objRadius)){
@@ -60,8 +61,6 @@ export default class Board extends Vue {
 
   mouseMove (event: any){
     if(this.isDrag){
-      this.context.globalCompositeOperation = "destination-out";
-      this.drawPlayer()
       this.context.drawImage(this.image, 0, 0)
       this.objX = event.clientX / this.scale
       this.objY = event.clientY /this.scale
@@ -85,21 +84,23 @@ export default class Board extends Vue {
     if(this.context){
       this.image.src = "image/board.png"
       this.image.onload = () => {
-        // this.scale = width / this.image.width
-        // this.context.setTransform(this.scale,0,0,this.scale,0,0)
-        // this.context.drawImage(this.image, 0, 0)
+        this.scale = width / this.image.width
+        this.context.setTransform(this.scale,0,0,this.scale,0,0)
+        this.context.drawImage(this.image, 0, 0)
         this.drawPlayer()
       }
 
-      // window.onresize = () => {
-      //   this.context.clearRect(0,0,this.canvas.width,this.canvas.height)
-      //   this.canvas.width = this.container.clientWidth
-      //   this.canvas.height = this.container.clientHeight
-      //   let scale = this.canvas.width / image.width
-      //   this.context.setTransform(scale,0,0,scale,0,0)
-      //   this.context.drawImage(image, 0, 0)
-      //   this.drawPlayer()
-      // }
+      window.onresize = () => {
+        // this.context.clearRect(0,0,this.canvas.width,this.canvas.height)
+
+        // this.canvas.height = this.container.clientHeight
+        this.scale = this.canvas.clientWidth / this.image.width
+        // this.canvas.width = this.container.clientWidth
+        // this.context.setTransform(this.scale,0,0,this.scale,0,0)
+        // this.context.drawImage(this.image, 0, 0)
+        // this.drawPlayer()
+        // console.log(this.scale)
+      }
     }
   }
 }
@@ -118,5 +119,8 @@ export default class Board extends Vue {
   left: 0;
   width: 100%;
   height: 100%;
+  /*background-image: url("/image/board.png");*/
+  /*background-size: contain;*/
+  /*background-repeat: no-repeat;*/
 }
 </style>
