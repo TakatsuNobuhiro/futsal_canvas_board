@@ -21,20 +21,24 @@ export default class Board extends Vue {
   context: any = ''
   canvas: any = ''
   scale: number = 0
-  objX: number = 100
-  objY: number = 100
-  objRadius: number = 30
-  objColor: string = "#f00"
-  isDrag: boolean = false
-  image: Image = new Image
+  players = [
 
-  drawPlayer () {
+    [1,200,540,"#ed230c"], [2,500,200,"#ed230c"],[3,400,540,"#ed230c"],[4,540,900,"#ed230c"],[5,1300,540,"#ed230c"],
+    [1,1700,540,"#09a1ff"], [2,1400,200,"#09a1ff"],[3,1500,540,"#09a1ff"],[4,1400,900,"#09a1ff"],[5,700,540,"#09a1ff"]
+
+  ]
+  objRadius: number = 30
+  isDrag: boolean = false
+  dragPlayer: number | string = 0
+  image: HTMLImageElement = new Image
+
+  drawPlayer (player: any) {
     // 円を描画
-    this.context.strokeStyle = this.objColor;
-    this.context.fillStyle = this.objColor;
+    this.context.strokeStyle = player[3];
+    this.context.fillStyle = player[3];
     this.context.lineWidth = 5;
     this.context.beginPath();
-    this.context.arc(this.objX,this.objY,this.objRadius,0,2 * Math.PI,true)
+    this.context.arc(player[1],player[2],this.objRadius,0,2 * Math.PI,true)
     this.context.closePath()
     this.context.fill();
     // 文字（数字）を描画
@@ -42,30 +46,43 @@ export default class Board extends Vue {
     this.context.textBaseline = "middle"
     this.context.textAlign = "center"
     this.context.fillStyle = "white"
-    this.context.fillText(1,this.objX,this.objY)
+    this.context.fillText(player[0],player[1],player[2])
+  }
+
+  drawPlayers (){
+    for (let player of this.players.slice().reverse()){
+      this.drawPlayer(player)
+    }
   }
 
   // キャンバスにマウスをダウンしたときの処理
   mouseDown (event: any) {
     let mouseX = event.clientX / this.scale
     let mouseY = event.clientY / this.scale
-
-    // マウスがオブジェクト上にあるか判定
-    if ((this.objX - this.objRadius < mouseX && mouseX< this.objX + this.objRadius)
-      &&(this.objY - this.objRadius < mouseY && this.objY + this.objRadius)){
-      this.isDrag = true
-    }else{
-      this.isDrag = false
+    for (let i = 0; i < this.players.length; i++){
+      let player = this.players[i]
+      // マウスがオブジェクト上にあるか判定
+      if (((player[1] - this.objRadius) < mouseX && mouseX< (player[1] + this.objRadius)
+        &&((player[2] - this.objRadius) < mouseY && (player[2] + this.objRadius)))){
+        this.isDrag = true
+        this.players.unshift(player)
+        this.players.splice(i+1,1);
+        console.log(this.players)
+        return
+      }else{
+        this.isDrag = false
+      }
     }
   }
 
   mouseMove (event: any){
     if(this.isDrag){
       this.context.drawImage(this.image, 0, 0)
-      this.objX = event.clientX / this.scale
-      this.objY = event.clientY /this.scale
+      console.log(this.players)
+      this.players[0][1] = event.clientX / this.scale
+      this.players[0][2] = event.clientY /this.scale
       this.context.globalCompositeOperation = "source-over";
-      this.drawPlayer()
+      this.drawPlayers()
     }
   }
 
@@ -87,7 +104,7 @@ export default class Board extends Vue {
         this.scale = width / this.image.width
         this.context.setTransform(this.scale,0,0,this.scale,0,0)
         this.context.drawImage(this.image, 0, 0)
-        this.drawPlayer()
+        this.drawPlayers()
       }
 
       window.onresize = () => {
