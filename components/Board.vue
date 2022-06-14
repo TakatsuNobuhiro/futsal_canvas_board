@@ -9,6 +9,7 @@
         @mouseup="mouseUp"
       />
     </div>
+    <a class="btn btn-danger" id="download" href="">画像をダウンロード</a>
   </div>
 </template>
 
@@ -21,76 +22,96 @@ export default class Board extends Vue {
   context: any = ''
   canvas: any = ''
   scale: number = 0
-  players = [
-
-    [1,200,540,"#ed230c"], [2,500,200,"#ed230c"],[3,400,540,"#ed230c"],[4,540,900,"#ed230c"],[5,1300,540,"#ed230c"],
-    [1,1700,540,"#09a1ff"], [2,1400,200,"#09a1ff"],[3,1500,540,"#09a1ff"],[4,1400,900,"#09a1ff"],[5,700,540,"#09a1ff"]
-
+  dlLink: HTMLElement | null = null
+  players: [number, number, number, string][] = [
+    [1, 200, 540, '#ed230c'], [2, 500, 200, '#ed230c'], [3, 400, 540, '#ed230c'], [4, 540, 900, '#ed230c'], [5, 1300, 540, '#ed230c'],
+    [1, 1700, 540, '#09a1ff'], [2, 1400, 200, '#09a1ff'], [3, 1500, 540, '#09a1ff'], [4, 1400, 900, '#09a1ff'], [5, 700, 540, '#09a1ff'],
+    [0, 500, 540, '#09a1ff']
   ]
   objRadius: number = 30
   isDrag: boolean = false
-  dragPlayer: number | string = 0
+  dx: number = 0
+  dy: number = 0
   image: HTMLImageElement = new Image
+  ball: HTMLImageElement = new Image
 
-  drawPlayer (player: any) {
-    // 円を描画
-    this.context.strokeStyle = player[3];
-    this.context.fillStyle = player[3];
-    this.context.lineWidth = 5;
-    this.context.beginPath();
-    this.context.arc(player[1],player[2],this.objRadius,0,2 * Math.PI,true)
-    this.context.closePath()
-    this.context.fill();
-    // 文字（数字）を描画
-    this.context.font = 'bold 32px sans-serif'
-    this.context.textBaseline = "middle"
-    this.context.textAlign = "center"
-    this.context.fillStyle = "white"
-    this.context.fillText(player[0],player[1],player[2])
+  drawPlayer(player: any) {
+    if (player[0] === 0) {
+      this.context.drawImage(this.ball, 0, 0, 1900, 1900, player[1] - 30, player[2] - 30, 80/this.scale, 80/this.scale)
+    } else {
+      // 円を描画
+      this.context.strokeStyle = player[3];
+      this.context.fillStyle = player[3];
+      this.context.lineWidth = 5;
+      this.context.beginPath();
+      this.context.arc(player[1], player[2], this.objRadius, 0, 2 * Math.PI, true)
+      this.context.closePath()
+      this.context.fill();
+      // 文字（数字）を描画
+      this.context.font = 'bold 32px sans-serif'
+      this.context.textBaseline = "middle"
+      this.context.textAlign = "center"
+      this.context.fillStyle = "white"
+      this.context.fillText(player[0], player[1], player[2])
+    }
   }
 
-  drawPlayers (){
-    for (let player of this.players.slice().reverse()){
+  drawPlayers() {
+    this.context.drawImage(this.image, 0, 0)
+    for (let player of this.players.slice().reverse()) {
       this.drawPlayer(player)
     }
   }
 
   // キャンバスにマウスをダウンしたときの処理
-  mouseDown (event: any) {
+  mouseDown(event: any) {
     let mouseX = event.clientX / this.scale
     let mouseY = event.clientY / this.scale
-    for (let i = 0; i < this.players.length; i++){
+    for (let i = 0; i < this.players.length; i++) {
       let player = this.players[i]
       // マウスがオブジェクト上にあるか判定
-      if (((player[1] - this.objRadius) < mouseX && mouseX< (player[1] + this.objRadius)
-        &&((player[2] - this.objRadius) < mouseY && (player[2] + this.objRadius)))){
+      let dx = player[1] - mouseX
+      let dy = player[2] - mouseY
+      if (dx**2 + dy**2 < this.objRadius**2) {
         this.isDrag = true
         this.players.unshift(player)
-        this.players.splice(i+1,1);
-        console.log(this.players)
+        this.players.splice(i + 1, 1);
+        this.dx = mouseX - this.players[0][1]
+        this.dy = mouseY - this.players[0][2]
         return
-      }else{
+      } else {
         this.isDrag = false
       }
     }
   }
 
-  mouseMove (event: any){
-    if(this.isDrag){
-      this.context.drawImage(this.image, 0, 0)
-      console.log(this.players)
-      this.players[0][1] = event.clientX / this.scale
-      this.players[0][2] = event.clientY /this.scale
-      this.context.globalCompositeOperation = "source-over";
+  mouseMove(event: any) {
+    const mouseX = event.clientX / this.scale
+    const mouseY = event.clientY / this.scale
+    if (this.isDrag) {
+      this.players[0][1] = mouseX - this.dx
+      this.players[0][2] = mouseY - this.dy
       this.drawPlayers()
     }
+    for (let i = 0; i < this.players.length; i++) {
+      let player = this.players[i]
+      // マウスがオブジェクト上にあるか判定
+      let dx = player[1] - mouseX
+      let dy = player[2] - mouseY
+      if (dx**2 + dy**2 < this.objRadius**2) {
+        this.canvas.style.cursor = 'move'
+        return
+      }
+    }
+    this.canvas.style.cursor = 'default'
   }
 
-  mouseUp (event: any){
+  mouseUp() {
     this.isDrag = false
+    this.dlLink?.href = this.canvas.toDataURL() ?? ""
   }
 
-  mounted(){
+  mounted() {
     this.container = document.querySelector('#canvas-container')
     this.canvas = document.querySelector('#canvas')
     this.context = this.canvas.getContext('2d')
@@ -98,25 +119,24 @@ export default class Board extends Vue {
     this.canvas.height = this.container.clientHeight
     let width = this.canvas.clientWidth
 
-    if(this.context){
+    if (this.context) {
       this.image.src = "image/board.png"
-      this.image.onload = () => {
+      this.ball.src = "image/ball.svg"
+      this.ball.onload = () => {
         this.scale = width / this.image.width
-        this.context.setTransform(this.scale,0,0,this.scale,0,0)
-        this.context.drawImage(this.image, 0, 0)
+        this.context.setTransform(this.scale, 0, 0, this.scale, 0, 0)
         this.drawPlayers()
+        this.dlLink = document.getElementById('download')
+        this.dlLink.download = "フットテック";
       }
 
       window.onresize = () => {
-        // this.context.clearRect(0,0,this.canvas.width,this.canvas.height)
-
         // this.canvas.height = this.container.clientHeight
         this.scale = this.canvas.clientWidth / this.image.width
         // this.canvas.width = this.container.clientWidth
         // this.context.setTransform(this.scale,0,0,this.scale,0,0)
         // this.context.drawImage(this.image, 0, 0)
         // this.drawPlayer()
-        // console.log(this.scale)
       }
     }
   }
@@ -125,12 +145,13 @@ export default class Board extends Vue {
 
 
 <style scoped>
-.canvas-container{
+.canvas-container {
   position: relative;
   height: 0;
   padding-top: 56.25%;
 }
-.canvas{
+
+.canvas {
   position: absolute;
   top: 0;
   left: 0;
