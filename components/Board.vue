@@ -25,7 +25,7 @@ export default class Board extends Vue {
   dlLink: HTMLElement | null = null
   players: [number, number, number, string][] = [
     [1, 200, 540, '#ed230c'], [2, 500, 200, '#ed230c'], [3, 400, 540, '#ed230c'], [4, 540, 900, '#ed230c'], [5, 1300, 540, '#ed230c'],
-    [1, 1700, 540, '#09a1ff'], [2, 1400, 200, '#09a1ff'], [3, 1500, 540, '#09a1ff'], [4, 1400, 900, '#09a1ff'], [5, 700, 540, '#09a1ff'],
+    [1, 1700, 540, '#09a1ff'], [2, 800, 200, '#09a1ff'], [3, 1500, 540, '#09a1ff'], [4, 800, 900, '#09a1ff'], [5, 700, 540, '#09a1ff'],
     [0, 500, 540, '#09a1ff']
   ]
   objRadius: number = 30
