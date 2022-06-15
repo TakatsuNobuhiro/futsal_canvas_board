@@ -22,6 +22,7 @@ export default class Board extends Vue {
   context: any = ''
   canvas: any = ''
   scale: number = 0
+  imageScale: number = 0
   dlLink: HTMLElement | null = null
   players: [number, number, number, string][] = [
     [1, 200, 540, '#ed230c'], [2, 500, 200, '#ed230c'], [3, 400, 540, '#ed230c'], [4, 540, 900, '#ed230c'], [5, 1300, 540, '#ed230c'],
@@ -37,7 +38,7 @@ export default class Board extends Vue {
 
   drawPlayer(player: any) {
     if (player[0] === 0) {
-      this.context.drawImage(this.ball, 0, 0, 1900, 1900, player[1] - 30, player[2] - 30, 80/this.scale, 80/this.scale)
+      this.context.drawImage(this.ball, 0, 0, 1900, 1900, player[1] - 30, player[2] - 30, 80/this.imageScale, 80/this.imageScale)
     } else {
       // 円を描画
       this.context.strokeStyle = player[3];
@@ -124,6 +125,7 @@ export default class Board extends Vue {
       this.ball.src = "image/ball.svg"
       this.ball.onload = () => {
         this.scale = width / this.image.width
+        this.imageScale = this.scale
         this.context.setTransform(this.scale, 0, 0, this.scale, 0, 0)
         this.drawPlayers()
         this.dlLink = document.getElementById('download')
