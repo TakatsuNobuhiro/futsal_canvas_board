@@ -5,11 +5,14 @@
         id="canvas"
         class="canvas"
         @mousedown="mouseDown"
+        @touchstart="mouseDown"
         @mousemove="mouseMove"
+        @touchmove="mouseMove"
         @mouseup="mouseUp"
+        @touchend="mouseUp"
       />
     </div>
-    <a class="btn btn-danger" id="download" href="">画像をダウンロード</a>
+<!--    <a class="btn btn-danger" id="download" href="">画像をダウンロード</a>-->
   </div>
 </template>
 
@@ -109,7 +112,7 @@ export default class Board extends Vue {
 
   mouseUp() {
     this.isDrag = false
-    this.dlLink?.href = this.canvas.toDataURL() ?? ""
+    // this.dlLink?.href = this.canvas.toDataURL() ?? ""
   }
 
   mounted() {
@@ -129,7 +132,7 @@ export default class Board extends Vue {
         this.context.setTransform(this.scale, 0, 0, this.scale, 0, 0)
         this.drawPlayers()
         this.dlLink = document.getElementById('download')
-        this.dlLink.download = "フットテック";
+        // this.dlLink.download = "フットテック";
       }
 
       window.onresize = () => {
