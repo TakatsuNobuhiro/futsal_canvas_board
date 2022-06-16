@@ -1,4 +1,14 @@
 export default {
+  publicRuntimeConfig: {
+    API_KEY : process.env.API_KEY,
+    AUTH_DOMAIN : process.env.AUTH_DOMAIN,
+    DATABASE_URL : process.env.API_KEY,
+    PROJECT_ID : process.env.API_KEY,
+    STORAGE_BUCKET : process.env.API_KEY,
+    MESSAGING_SENDER_ID : process.env.API_KEY,
+    APP_ID : process.env.API_KEY,
+    MEASUREMENT_ID : process.env.API_KEY,
+  },
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
 
