@@ -12,7 +12,7 @@
         @dragend="mouseUp"
       />
     </div>
-    <a class="btn btn-danger" id="download" href="">画像をダウンロード</a>
+    <a class="btn btn-primary" id="download" href="">画像をダウンロード</a>
   </div>
 </template>
 
