@@ -5,11 +5,11 @@
         id="canvas"
         class="canvas"
         @mousedown="mouseDown"
-        @touchstart="mouseDown"
+        @dragstart="mouseDown"
         @mousemove="mouseMove"
-        @touchmove="mouseMove"
+        @dragover="mouseMove"
         @mouseup="mouseUp"
-        @touchend="mouseUp"
+        @dragend="mouseUp"
       />
     </div>
     <a class="btn btn-danger" id="download" href="">画像をダウンロード</a>
