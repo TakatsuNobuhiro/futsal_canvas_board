@@ -2,12 +2,12 @@ export default {
   publicRuntimeConfig: {
     API_KEY : process.env.API_KEY,
     AUTH_DOMAIN : process.env.AUTH_DOMAIN,
-    DATABASE_URL : process.env.API_KEY,
-    PROJECT_ID : process.env.API_KEY,
-    STORAGE_BUCKET : process.env.API_KEY,
-    MESSAGING_SENDER_ID : process.env.API_KEY,
-    APP_ID : process.env.API_KEY,
-    MEASUREMENT_ID : process.env.API_KEY,
+    DATABASE_URL : process.env.DATABASE_URL,
+    PROJECT_ID : process.env.PROJECT_ID,
+    STORAGE_BUCKET : process.env.STORAGE_BUCKET,
+    MESSAGING_SENDER_ID : process.env.MESSAGING_SENDER_ID,
+    APP_ID : process.env.APP_ID,
+    MEASUREMENT_ID : process.env.MEASUREMENT_ID,
   },
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -37,8 +37,8 @@ export default {
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [
-  ],
+  plugins: ['@/plugins/firebase.js']
+  ,
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -60,5 +60,5 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-  }
+  },
 }
