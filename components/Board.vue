@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
+import { getDatabase, ref, onValue} from "firebase/database";
 
 @Component({})
 export default class Board extends Vue {
@@ -128,13 +129,15 @@ export default class Board extends Vue {
     if (this.context) {
       this.image.src = "image/board.png"
       this.ball.src = "image/ball.svg"
-      this.ball.onload = () => {
-        this.scale = width / this.image.width
-        this.imageScale = this.scale
-        this.context.setTransform(this.scale, 0, 0, this.scale, 0, 0)
-        this.drawPlayers()
-        this.dlLink = document.getElementById('download')
-        this.dlLink.download = "フットテック";
+      this.image.onload = () => {
+        this.ball.onload = () => {
+          this.scale = width / this.image.width
+          this.imageScale = this.scale
+          this.context.setTransform(this.scale, 0, 0, this.scale, 0, 0)
+          this.drawPlayers()
+          this.dlLink = document.getElementById('download')
+          this.dlLink.download = "フットテック";
+        }
       }
 
       window.onresize = () => {
