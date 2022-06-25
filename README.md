@@ -2,9 +2,9 @@
 リアルタイムで駒を動かせるフットサル戦術ボード
 
 ## 使用技術
-- firebase (real-time)
-- nuxt2(nuxt-property-decorator)
-- typescript
+- firebase (real-time,hosting)
+- nuxt2,vue2
+- typescript(nuxt-property-decorator)
 - githubActions
 
 ## Build Setup
@@ -22,6 +22,9 @@ $ npm run start
 
 # generate static project
 $ npm run generate
+
+# package-lock.jsonからインストール
+$ npm ci
 ```
 
 For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
