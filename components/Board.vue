@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import { getDatabase, ref, onValue} from "firebase/database";
+// import { getDatabase, ref, onValue} from "firebase/database";
 
 @Component({})
 export default class Board extends Vue {
@@ -119,37 +119,38 @@ export default class Board extends Vue {
   }
 
   mounted() {
-    this.container = document.querySelector('#canvas-container')
-    this.canvas = document.querySelector('#canvas')
+    this.container = document.querySelector<HTMLElement>('#canvas-container')
+    this.canvas = document.querySelector<HTMLElement>('#canvas')
     this.context = this.canvas.getContext('2d')
     this.canvas.width = this.container.clientWidth
     this.canvas.height = this.container.clientHeight
     let width = this.canvas.clientWidth
 
-    if (this.context) {
-      this.image.src = "image/board.png"
-      this.ball.src = "image/ball.svg"
-      this.image.onload = () => {
-        this.ball.onload = () => {
-          this.scale = width / this.image.width
-          this.imageScale = this.scale
-          this.context.setTransform(this.scale, 0, 0, this.scale, 0, 0)
-          this.drawPlayers()
-          this.dlLink = document.getElementById('download')
-          this.dlLink.download = "フットテック";
-        }
-      }
 
-      window.onresize = () => {
-        // this.canvas.height = this.container.clientHeight
-        this.scale = this.canvas.clientWidth / this.image.width
-        // this.canvas.width = this.container.clientWidth
-        // this.context.setTransform(this.scale,0,0,this.scale,0,0)
-        // this.context.drawImage(this.image, 0, 0)
-        // this.drawPlayer()
-      }
+
+    this.image.src = "image/board.png"
+    this.ball.src = "image/ball.svg"
+    this.image.onload = () => {
+
+      this.scale = width / this.image.width
+      this.imageScale = this.scale
+      this.context.setTransform(this.scale, 0, 0, this.scale, 0, 0)
+      this.drawPlayers()
+      this.dlLink = document.querySelector('#download')
+      this.dlLink.download = "フットテック";
+
+    }
+
+    window.onresize = () => {
+      // this.canvas.height = this.container.clientHeight
+      this.scale = this.canvas.clientWidth / this.image.width
+      // this.canvas.width = this.container.clientWidth
+      // this.context.setTransform(this.scale,0,0,this.scale,0,0)
+      // this.context.drawImage(this.image, 0, 0)
+      // this.drawPlayer()
     }
   }
+
 }
 </script>
 
