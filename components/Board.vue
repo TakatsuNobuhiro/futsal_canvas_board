@@ -35,9 +35,9 @@ export default class Board extends Vue {
   imageScale: number = 0
   dlLink: any = null
   players: [number, number, number, string][] = [
-    [1, 200, 540, '#ed230c'], [2, 500, 200, '#ed230c'], [3, 400, 540, '#ed230c'], [4, 540, 900, '#ed230c'], [5, 1300, 540, '#ed230c'],
-    [1, 1700, 540, '#09a1ff'], [2, 800, 200, '#09a1ff'], [3, 1500, 540, '#09a1ff'], [4, 800, 900, '#09a1ff'], [5, 700, 540, '#09a1ff'],
-    [0, 500, 540, '#09a1ff']
+    [1, 200, 435, '#ed230c'], [2, 500, 95, '#ed230c'], [3, 400, 435, '#ed230c'], [4, 540, 795, '#ed230c'], [5, 1300, 435, '#ed230c'],
+    [1, 1700, 435, '#09a1ff'], [2, 800, 95, '#09a1ff'], [3, 1500, 435, '#09a1ff'], [4, 800, 795, '#09a1ff'], [5, 700, 435, '#09a1ff'],
+    [0, 500, 435, '#09a1ff']
   ]
   objRadius: number = 30
   isDrag: boolean = false
@@ -68,7 +68,8 @@ export default class Board extends Vue {
   }
 
   drawPlayers() {
-    this.context.drawImage(this.image, 0, 0)
+    this.context.clearRect(0,0,1920,3000)
+    this.context.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
     for (let player of this.players.slice().reverse()) {
       this.drawPlayer(player)
     }
