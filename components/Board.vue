@@ -4,9 +4,14 @@
       <canvas
         id="canvas"
         class="canvas"
-        v-touch:start="mouseDown"
-        v-touch:moving="mouseMove"
-        v-touch:end="mouseUp"
+        @touchstart="mouseDown"
+        @mousedown="mouseDown"
+
+        @touchmove="mouseMove"
+        @mousemove="mouseMove"
+
+        @touchend="mouseUp"
+        @mouseup="mouseUp"
       />
     </div>
     <div>
@@ -22,6 +27,7 @@ import {Component, Vue} from 'vue-property-decorator';
 @Component({
 })
 export default class Board extends Vue {
+  device: string = ''
   container: any = ''
   context: any = ''
   canvas: any = ''
@@ -70,8 +76,16 @@ export default class Board extends Vue {
 
   // キャンバスにマウスをダウンしたときの処理
   mouseDown(event: any) {
-    let mouseX = event.clientX / this.scale
-    let mouseY = event.clientY / this.scale
+    let mouseX: number
+    let mouseY: number
+    if (this.device === 'mobile'){
+      const touch_event = event.changedTouches[0]
+      mouseX = touch_event.clientX / this.scale
+      mouseY = touch_event.clientY / this.scale
+    }else{
+      mouseX = event.clientX / this.scale
+      mouseY = event.clientY / this.scale
+    }
     for (let i = 0; i < this.players.length; i++) {
       let player = this.players[i]
       // マウスがオブジェクト上にあるか判定
@@ -91,8 +105,17 @@ export default class Board extends Vue {
   }
 
   mouseMove(event: any) {
-    const mouseX = event.clientX / this.scale
-    const mouseY = event.clientY / this.scale
+    let mouseX: number
+    let mouseY: number
+    if (this.device === 'mobile'){
+      const touch_event = event.changedTouches[0]
+      mouseX = touch_event.clientX / this.scale
+      mouseY = touch_event.clientY / this.scale
+    }else{
+      mouseX = event.clientX / this.scale
+      mouseY = event.clientY / this.scale
+    }
+
     if (this.isDrag) {
       this.players[0][1] = mouseX - this.dx
       this.players[0][2] = mouseY - this.dy
@@ -117,6 +140,16 @@ export default class Board extends Vue {
   }
 
   mounted() {
+    // スマホでのタッチ操作でのスクロール禁止
+    document.addEventListener("touchmove",(event: any) => { event.preventDefault() }, { passive: false });
+
+    const userAgent = navigator.userAgent;
+    if(userAgent.indexOf('iPhone') > 0 || userAgent.indexOf('iPod') > 0 || userAgent.indexOf('Android') > 0 && userAgent.indexOf('Mobile') > 0 || userAgent.indexOf('iPad') > 0){
+      this.device = 'mobile'
+    } else {
+      this.device = 'desktop'
+    }
+
     this.container = document.querySelector<HTMLElement>('#canvas-container')
     this.canvas = document.querySelector<HTMLElement>('#canvas')
     this.context = this.canvas.getContext('2d')
@@ -157,6 +190,7 @@ export default class Board extends Vue {
   position: relative;
   height: 0;
   padding-top: 56.25%;
+  user-select: none;
 }
 
 .canvas {
@@ -165,6 +199,7 @@ export default class Board extends Vue {
   left: 0;
   width: 100%;
   height: 100%;
+  user-select: none;
   /*background-image: url("/image/board.png");*/
   /*background-size: contain;*/
   /*background-repeat: no-repeat;*/
