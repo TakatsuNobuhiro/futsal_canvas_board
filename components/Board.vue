@@ -4,12 +4,9 @@
       <canvas
         id="canvas"
         class="canvas"
-        @mousedown="mouseDown"
-        @touchstart="mouseDown"
-        @mousemove="mouseMove"
-        @touchmove="mouseMove"
-        @mouseup="mouseUp"
-        @touchend="mouseUp"
+        v-touch:start="mouseDown"
+        v-touch:moving="mouseMove"
+        v-touch:end="mouseUp"
       />
     </div>
     <div>
@@ -22,7 +19,8 @@
 import {Component, Vue} from 'vue-property-decorator';
 // import { getDatabase, ref, onValue} from "firebase/database";
 
-@Component({})
+@Component({
+})
 export default class Board extends Vue {
   container: any = ''
   context: any = ''
@@ -138,7 +136,6 @@ export default class Board extends Vue {
       this.drawPlayers()
       this.dlLink = document.querySelector('#download')
       this.dlLink.download = "フットテック";
-
     }
 
     window.onresize = () => {
