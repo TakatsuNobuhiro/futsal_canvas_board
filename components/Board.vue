@@ -142,7 +142,7 @@ export default class Board extends Vue {
 
   mounted() {
     // スマホでのタッチ操作でのスクロール禁止
-    document.addEventListener("touchmove",(event: any) => { event.preventDefault() }, { passive: false });
+    // document.addEventListener("touchmove",(event: any) => { event.preventDefault() }, { passive: false });
 
     const userAgent = navigator.userAgent;
     if(userAgent.indexOf('iPhone') > 0 || userAgent.indexOf('iPod') > 0 || userAgent.indexOf('Android') > 0 && userAgent.indexOf('Mobile') > 0 || userAgent.indexOf('iPad') > 0){
@@ -157,10 +157,7 @@ export default class Board extends Vue {
     this.canvas.width = this.container.clientWidth
     this.canvas.height = this.container.clientHeight
     let width = this.canvas.clientWidth
-
-
-
-    this.image.src = "image/board.png"
+    this.image.src = "image/futtech_board.png"
     this.ball.src = "image/ball.svg"
     this.image.onload = () => {
 
