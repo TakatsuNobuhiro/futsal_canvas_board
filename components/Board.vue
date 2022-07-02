@@ -5,11 +5,11 @@
         id="canvas"
         class="canvas"
         @mousedown="mouseDown"
-        @dragstart="mouseDown"
+        @touchstart="mouseDown"
         @mousemove="mouseMove"
-        @dragover="mouseMove"
+        @touchmove="mouseMove"
         @mouseup="mouseUp"
-        @dragend="mouseUp"
+        @touchend="mouseUp"
       />
     </div>
     <div>
