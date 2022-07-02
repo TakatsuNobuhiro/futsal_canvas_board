@@ -4,10 +4,10 @@
       <canvas
         id="canvas"
         class="canvas"
-        @touchstart="mouseDown"
+        @touchstart.prevent="mouseDown"
         @mousedown="mouseDown"
 
-        @touchmove="mouseMove"
+        @touchmove.prevent="mouseMove"
         @mousemove="mouseMove"
 
         @touchend="mouseUp"
