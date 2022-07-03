@@ -28,6 +28,7 @@ import {Component, Vue} from 'vue-property-decorator';
 })
 export default class Board extends Vue {
   device: string = ''
+  scrollY: number = 0
   container: any = ''
   context: any = ''
   canvas: any = ''
@@ -82,10 +83,10 @@ export default class Board extends Vue {
     if (this.device === 'mobile'){
       const touch_event = event.changedTouches[0]
       mouseX = touch_event.clientX / this.scale
-      mouseY = touch_event.clientY / this.scale
+      mouseY = (touch_event.clientY + this.scrollY) / this.scale
     }else{
       mouseX = event.clientX / this.scale
-      mouseY = event.clientY / this.scale
+      mouseY = (event.clientY + this.scrollY)/ this.scale
     }
     for (let i = 0; i < this.players.length; i++) {
       let player = this.players[i]
@@ -111,10 +112,10 @@ export default class Board extends Vue {
     if (this.device === 'mobile'){
       const touch_event = event.changedTouches[0]
       mouseX = touch_event.clientX / this.scale
-      mouseY = touch_event.clientY / this.scale
+      mouseY = (touch_event.clientY + this.scrollY)/ this.scale
     }else{
       mouseX = event.clientX / this.scale
-      mouseY = event.clientY / this.scale
+      mouseY = (event.clientY + this.scrollY) / this.scale
     }
 
     if (this.isDrag) {
@@ -140,6 +141,10 @@ export default class Board extends Vue {
     this.dlLink.href = this.canvas.toDataURL()
   }
 
+  handleScroll() {
+    this.scrollY = window.scrollY
+  }
+
   mounted() {
     // スマホでのタッチ操作でのスクロール禁止
     // document.addEventListener("touchmove",(event: any) => { event.preventDefault() }, { passive: false });
@@ -150,6 +155,7 @@ export default class Board extends Vue {
     } else {
       this.device = 'desktop'
     }
+    window.addEventListener("scroll", this.handleScroll);
 
     this.container = document.querySelector<HTMLElement>('#canvas-container')
     this.canvas = document.querySelector<HTMLElement>('#canvas')
