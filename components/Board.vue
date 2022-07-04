@@ -29,9 +29,9 @@ import {Component, Vue} from 'vue-property-decorator';
 export default class Board extends Vue {
   device: string = ''
   scrollY: number = 0
-  container: any = ''
+  container: HTMLElement | null = null
+  canvas: HTMLCanvasElement | null = null
   context: any = ''
-  canvas: any = ''
   scale: number = 0
   imageScale: number = 0
   dlLink: any = null
@@ -129,16 +129,16 @@ export default class Board extends Vue {
       let dx = player[1] - mouseX
       let dy = player[2] - mouseY
       if (dx**2 + dy**2 < this.objRadius**2) {
-        this.canvas.style.cursor = 'move'
+        this.canvas!.style.cursor = 'move'
         return
       }
     }
-    this.canvas.style.cursor = 'default'
+    this.canvas!.style.cursor = 'default'
   }
 
   mouseUp() {
     this.isDrag = false
-    this.dlLink.href = this.canvas.toDataURL()
+    this.dlLink.href = this.canvas?.toDataURL()
   }
 
   handleScroll() {
@@ -158,10 +158,10 @@ export default class Board extends Vue {
     window.addEventListener("scroll", this.handleScroll);
 
     this.container = document.querySelector<HTMLElement>('#canvas-container')
-    this.canvas = document.querySelector<HTMLElement>('#canvas')
+    this.canvas = document.querySelector<HTMLElement>('#canvas') as HTMLCanvasElement
     this.context = this.canvas.getContext('2d')
-    this.canvas.width = this.container.clientWidth
-    this.canvas.height = this.container.clientHeight
+    this.canvas.width = <number>this.container?.clientWidth
+    this.canvas.height = <number>this.container?.clientHeight
     let width = this.canvas.clientWidth
     this.image.src = "image/futtech_board.png"
     this.ball.src = "image/ball.svg"
@@ -177,7 +177,7 @@ export default class Board extends Vue {
 
     window.onresize = () => {
       // this.canvas.height = this.container.clientHeight
-      this.scale = this.canvas.clientWidth / this.image.width
+      this.scale = (this.canvas as HTMLElement).clientWidth / this.image.width
       // this.canvas.width = this.container.clientWidth
       // this.context.setTransform(this.scale,0,0,this.scale,0,0)
       // this.context.drawImage(this.image, 0, 0)
