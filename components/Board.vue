@@ -47,7 +47,7 @@ export default class Board extends Vue {
   image: HTMLImageElement = new Image
   ball: HTMLImageElement = new Image
 
-  drawPlayer(player: any) {
+  drawPlayer(player: [number, number, number, string]) {
     if (player[0] === 0) {
       this.context.drawImage(this.ball, 0, 0, 1900, 1900, player[1] - 30, player[2] - 30, 80/this.imageScale, 80/this.imageScale)
     } else {
@@ -64,7 +64,7 @@ export default class Board extends Vue {
       this.context.textBaseline = "middle"
       this.context.textAlign = "center"
       this.context.fillStyle = "white"
-      this.context.fillText(player[0], player[1], player[2])
+      this.context.fillText(String(player[0]), player[1], player[2])
     }
   }
 
