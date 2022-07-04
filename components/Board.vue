@@ -31,10 +31,10 @@ export default class Board extends Vue {
   scrollY: number = 0
   container: HTMLElement | null = null
   canvas: HTMLCanvasElement | null = null
-  context: any = ''
+  context: CanvasRenderingContext2D | null = null
   scale: number = 0
   imageScale: number = 0
-  dlLink: any = null
+  dlLink: HTMLAnchorElement | null = null
   players: [number, number, number, string][] = [
     [1, 200, 435, '#ed230c'], [2, 500, 95, '#ed230c'], [3, 400, 435, '#ed230c'], [4, 540, 795, '#ed230c'], [5, 1300, 435, '#ed230c'],
     [1, 1700, 435, '#09a1ff'], [2, 800, 95, '#09a1ff'], [3, 1500, 435, '#09a1ff'], [4, 800, 795, '#09a1ff'], [5, 700, 435, '#09a1ff'],
@@ -48,29 +48,30 @@ export default class Board extends Vue {
   ball: HTMLImageElement = new Image
 
   drawPlayer(player: [number, number, number, string]) {
+    const context = this.context as CanvasRenderingContext2D
     if (player[0] === 0) {
-      this.context.drawImage(this.ball, 0, 0, 1900, 1900, player[1] - 30, player[2] - 30, 80/this.imageScale, 80/this.imageScale)
+      this.context?.drawImage(this.ball, 0, 0, 1900, 1900, player[1] - 30, player[2] - 30, 80/this.imageScale, 80/this.imageScale)
     } else {
       // 円を描画
-      this.context.strokeStyle = player[3];
-      this.context.fillStyle = player[3];
-      this.context.lineWidth = 5;
-      this.context.beginPath();
-      this.context.arc(player[1], player[2], this.objRadius, 0, 2 * Math.PI, true)
-      this.context.closePath()
-      this.context.fill();
+      context.strokeStyle = player[3];
+      context.fillStyle = player[3];
+      context.lineWidth = 5;
+      context.beginPath();
+      context.arc(player[1], player[2], this.objRadius, 0, 2 * Math.PI, true)
+      context.closePath()
+      context.fill();
       // 文字（数字）を描画
-      this.context.font = 'bold 32px sans-serif'
-      this.context.textBaseline = "middle"
-      this.context.textAlign = "center"
-      this.context.fillStyle = "white"
-      this.context.fillText(String(player[0]), player[1], player[2])
+      context.font = 'bold 32px sans-serif'
+      context.textBaseline = "middle"
+      context.textAlign = "center"
+      context.fillStyle = "white"
+      context.fillText(String(player[0]), player[1], player[2])
     }
   }
 
   drawPlayers() {
-    this.context.clearRect(0,0,1920,3000)
-    this.context.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
+    this.context?.clearRect(0,0,1920,3000)
+    this.context?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
     for (let player of this.players.slice().reverse()) {
       this.drawPlayer(player)
     }
@@ -138,7 +139,7 @@ export default class Board extends Vue {
 
   mouseUp() {
     this.isDrag = false
-    this.dlLink.href = this.canvas?.toDataURL()
+    this.dlLink!.href = this.canvas?.toDataURL() as string
   }
 
   handleScroll() {
@@ -169,10 +170,10 @@ export default class Board extends Vue {
 
       this.scale = width / this.image.width
       this.imageScale = this.scale
-      this.context.setTransform(this.scale, 0, 0, this.scale, 0, 0)
+      this.context?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
       this.drawPlayers()
       this.dlLink = document.querySelector('#download')
-      this.dlLink.download = "フットテック";
+      this.dlLink!.download = "フットテック";
     }
 
     window.onresize = () => {
