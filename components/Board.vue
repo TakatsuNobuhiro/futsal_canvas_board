@@ -28,7 +28,6 @@ import {Component, Vue} from 'vue-property-decorator';
 })
 export default class Board extends Vue {
   device: string = ''
-  scrollY: number = 0
   container: HTMLElement | null = null
   canvas: HTMLCanvasElement | null = null
   context: CanvasRenderingContext2D | null = null
@@ -83,11 +82,11 @@ export default class Board extends Vue {
     let mouseY: number
     if (this.device === 'mobile'){
       const touch_event = (event as TouchEvent).changedTouches[0]
-      mouseX = touch_event.clientX / this.scale
-      mouseY = (touch_event.clientY + this.scrollY) / this.scale
+      mouseX = touch_event.pageX / this.scale
+      mouseY = (touch_event.pageY) / this.scale
     }else{
-      mouseX = (event as MouseEvent).clientX / this.scale
-      mouseY = ((event as MouseEvent).clientY + this.scrollY)/ this.scale
+      mouseX = (event as MouseEvent).pageX / this.scale
+      mouseY = ((event as MouseEvent).pageY)/ this.scale
     }
     for (let i = 0; i < this.players.length; i++) {
       let player = this.players[i]
@@ -112,11 +111,11 @@ export default class Board extends Vue {
     let mouseY: number
     if (this.device === 'mobile'){
       const touch_event = (event as TouchEvent).changedTouches[0]
-      mouseX = touch_event.clientX / this.scale
-      mouseY = (touch_event.clientY + this.scrollY)/ this.scale
+      mouseX = touch_event.pageX / this.scale
+      mouseY = (touch_event.pageY)/ this.scale
     }else{
-      mouseX = (event as MouseEvent).clientX / this.scale
-      mouseY = ((event as MouseEvent).clientY + this.scrollY) / this.scale
+      mouseX = (event as MouseEvent).pageX / this.scale
+      mouseY = ((event as MouseEvent).pageY) / this.scale
     }
 
     if (this.isDrag) {
@@ -142,10 +141,6 @@ export default class Board extends Vue {
     this.dlLink!.href = this.canvas?.toDataURL() as string
   }
 
-  handleScroll() {
-    this.scrollY = window.scrollY
-  }
-
   mounted() {
     // スマホでのタッチ操作でのスクロール禁止
     // document.addEventListener("touchmove",(event: TouchEvent) => { event.preventDefault() }, { passive: false });
@@ -156,7 +151,6 @@ export default class Board extends Vue {
     } else {
       this.device = 'desktop'
     }
-    window.addEventListener("scroll", this.handleScroll);
 
     this.container = document.querySelector<HTMLElement>('#canvas-container')
     this.canvas = document.querySelector<HTMLElement>('#canvas') as HTMLCanvasElement
