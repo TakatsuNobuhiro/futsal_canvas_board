@@ -78,16 +78,16 @@ export default class Board extends Vue {
   }
 
   // キャンバスにマウスをダウンしたときの処理
-  mouseDown(event: any) {
+  mouseDown(event: MouseEvent | TouchEvent) {
     let mouseX: number
     let mouseY: number
     if (this.device === 'mobile'){
-      const touch_event = event.changedTouches[0]
+      const touch_event = (event as TouchEvent).changedTouches[0]
       mouseX = touch_event.clientX / this.scale
       mouseY = (touch_event.clientY + this.scrollY) / this.scale
     }else{
-      mouseX = event.clientX / this.scale
-      mouseY = (event.clientY + this.scrollY)/ this.scale
+      mouseX = (event as MouseEvent).clientX / this.scale
+      mouseY = ((event as MouseEvent).clientY + this.scrollY)/ this.scale
     }
     for (let i = 0; i < this.players.length; i++) {
       let player = this.players[i]
@@ -107,16 +107,16 @@ export default class Board extends Vue {
     }
   }
 
-  mouseMove(event: any) {
+  mouseMove(event: MouseEvent | TouchEvent) {
     let mouseX: number
     let mouseY: number
     if (this.device === 'mobile'){
-      const touch_event = event.changedTouches[0]
+      const touch_event = (event as TouchEvent).changedTouches[0]
       mouseX = touch_event.clientX / this.scale
       mouseY = (touch_event.clientY + this.scrollY)/ this.scale
     }else{
-      mouseX = event.clientX / this.scale
-      mouseY = (event.clientY + this.scrollY) / this.scale
+      mouseX = (event as MouseEvent).clientX / this.scale
+      mouseY = ((event as MouseEvent).clientY + this.scrollY) / this.scale
     }
 
     if (this.isDrag) {
@@ -148,7 +148,7 @@ export default class Board extends Vue {
 
   mounted() {
     // スマホでのタッチ操作でのスクロール禁止
-    // document.addEventListener("touchmove",(event: any) => { event.preventDefault() }, { passive: false });
+    // document.addEventListener("touchmove",(event: TouchEvent) => { event.preventDefault() }, { passive: false });
 
     const userAgent = navigator.userAgent;
     if(userAgent.indexOf('iPhone') > 0 || userAgent.indexOf('iPod') > 0 || userAgent.indexOf('Android') > 0 && userAgent.indexOf('Mobile') > 0 || userAgent.indexOf('iPad') > 0){
