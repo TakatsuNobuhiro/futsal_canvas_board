@@ -151,15 +151,7 @@ export default class Board extends Vue {
 
   undo () {
     let i: number = this.undoIndex
-    console.log(i)
-    let history = JSON.parse(JSON.stringify(this.historyList[i]))
-    console.log(history)
-    console.log(this.historyList.length)
-    this.players = history
-    // for (let i = 0; i<this.players.length; i++){
-    //   this.players[i] = history[i]
-    // }
-    console.log(this.players)
+    this.players = JSON.parse(JSON.stringify(this.historyList[i]))
     this.drawPlayers()
     this.undoIndex += 1
   }
