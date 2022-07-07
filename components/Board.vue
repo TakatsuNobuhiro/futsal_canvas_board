@@ -16,6 +16,7 @@
     </div>
     <div>
       <a class="btn btn-primary" id="download" href="">画像をダウンロード</a>
+      <button class="btn btn-success" @click="undo">一つ戻る</button>
     </div>
   </div>
 </template>
@@ -34,6 +35,8 @@ export default class Board extends Vue {
   scale: number = 0
   imageScale: number = 0
   dlLink: HTMLAnchorElement | null = null
+  undoIndex: number = 1
+  historyList: [number, number, number, string][][] = []
   players: [number, number, number, string][] = [
     [1, 200, 435, '#ed230c'], [2, 500, 95, '#ed230c'], [3, 400, 435, '#ed230c'], [4, 540, 795, '#ed230c'], [5, 1300, 435, '#ed230c'],
     [1, 1700, 435, '#09a1ff'], [2, 800, 95, '#09a1ff'], [3, 1500, 435, '#09a1ff'], [4, 800, 795, '#09a1ff'], [5, 700, 435, '#09a1ff'],
@@ -119,8 +122,8 @@ export default class Board extends Vue {
     }
 
     if (this.isDrag) {
-      this.players[0][1] = mouseX - this.dx
-      this.players[0][2] = mouseY - this.dy
+      this.players[0].splice(1,1, mouseX - this.dx)
+      this.players[0].splice(2,1,mouseY - this.dy)
       this.drawPlayers()
     }
     for (let i = 0; i < this.players.length; i++) {
@@ -137,8 +140,28 @@ export default class Board extends Vue {
   }
 
   mouseUp() {
-    this.isDrag = false
+    if (this.isDrag) {
+      this.historyList.splice(0,this.undoIndex - 1)
+      this.historyList.unshift(JSON.parse(JSON.stringify(this.players)))
+      this.undoIndex = 1
+      this.isDrag = false
+    }
     this.dlLink!.href = this.canvas?.toDataURL() as string
+  }
+
+  undo () {
+    let i: number = this.undoIndex
+    console.log(i)
+    let history = JSON.parse(JSON.stringify(this.historyList[i]))
+    console.log(history)
+    console.log(this.historyList.length)
+    this.players = history
+    // for (let i = 0; i<this.players.length; i++){
+    //   this.players[i] = history[i]
+    // }
+    console.log(this.players)
+    this.drawPlayers()
+    this.undoIndex += 1
   }
 
   mounted() {
@@ -178,6 +201,7 @@ export default class Board extends Vue {
       // this.context.drawImage(this.image, 0, 0)
       // this.drawPlayer()
     }
+    this.historyList.unshift(JSON.parse(JSON.stringify(this.players)))
   }
 
 }
