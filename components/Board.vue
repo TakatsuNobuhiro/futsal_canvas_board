@@ -16,7 +16,7 @@
     </div>
     <div>
       <a class="btn btn-primary" id="download" href="">画像をダウンロード</a>
-      <button class="btn btn-success" @click="undo">一つ戻る</button>
+      <button class="btn btn-success" @click="undo" :disabled="isUndo" >一つ戻る</button>
     </div>
   </div>
 </template>
@@ -154,6 +154,11 @@ export default class Board extends Vue {
     this.players = JSON.parse(JSON.stringify(this.historyList[i]))
     this.drawPlayers()
     this.undoIndex += 1
+  }
+
+  get isUndo () {
+    console.log(this.historyList.length, this.undoIndex)
+    return this.historyList.length <= this.undoIndex
   }
 
   mounted() {
