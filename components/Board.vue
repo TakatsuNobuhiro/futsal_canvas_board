@@ -49,33 +49,78 @@ export default class Board extends Vue {
   image: HTMLImageElement = new Image
   ball: HTMLImageElement = new Image
 
-  drawPlayer(player: [number, number, number, string]) {
-    const context = this.context as CanvasRenderingContext2D
+  drawObject(player: [number, number, number, string]) {
     if (player[0] === 0) {
-      this.context?.drawImage(this.ball, 0, 0, 1900, 1900, player[1] - 30, player[2] - 30, 80/this.imageScale, 80/this.imageScale)
+      this.drawBall(player)
     } else {
-      // 円を描画
-      context.strokeStyle = player[3];
-      context.fillStyle = player[3];
-      context.lineWidth = 5;
-      context.beginPath();
-      context.arc(player[1], player[2], this.objRadius, 0, 2 * Math.PI, true)
-      context.closePath()
-      context.fill();
-      // 文字（数字）を描画
-      context.font = 'bold 32px sans-serif'
-      context.textBaseline = "middle"
-      context.textAlign = "center"
-      context.fillStyle = "white"
-      context.fillText(String(player[0]), player[1], player[2])
+      this.drawPlayer(player)
     }
   }
 
-  drawPlayers() {
+  drawBall (player: [number, number, number, string]) {
+    const context = this.context as CanvasRenderingContext2D
+    context.strokeStyle = 'black';
+    context.fillStyle = 'black';
+    context.lineWidth = 3;
+    const centerX = player[1]
+    const centerY = player[2]
+
+
+
+    const miniRadius = this.objRadius / 2
+    context.beginPath()
+    context.moveTo(centerX, centerY - miniRadius)
+    context.lineTo(centerX - 0.951 * miniRadius, -0.309 * miniRadius + centerY)
+    context.lineTo(centerX - 0.5877 * miniRadius, centerY + 0.809 * miniRadius)
+    context.lineTo(centerX + 0.5877 * miniRadius, centerY + 0.809 * miniRadius)
+    context.lineTo(centerX + 0.951 * miniRadius,  -0.309 * miniRadius + centerY)
+    context.lineTo(centerX, centerY - miniRadius)
+    context.fill()
+    context.lineTo(centerX, centerY - this.objRadius)
+    context.stroke()
+    context.moveTo(centerX - 0.951 * miniRadius, -0.309 * miniRadius + centerY)
+    context.lineTo(centerX - 0.961 * this.objRadius, -0.309 * this.objRadius + centerY)
+    context.stroke()
+    context.moveTo(centerX - 0.5877 * miniRadius, centerY + 0.809 * miniRadius)
+    context.lineTo(centerX - 0.5877 * this.objRadius, centerY + 0.809 * this.objRadius)
+    context.stroke()
+    context.moveTo(centerX + 0.5877 * miniRadius, centerY + 0.809 * miniRadius)
+    context.lineTo(centerX + 0.5877 * this.objRadius, centerY + 0.809 * this.objRadius)
+    context.stroke()
+    context.moveTo(centerX + 0.951 * miniRadius,  -0.309 * miniRadius + centerY)
+    context.lineTo(centerX + 0.951 * this.objRadius,  -0.309 * this.objRadius + centerY)
+    context.stroke()
+    context.closePath()
+
+    context.beginPath();
+    context.arc(centerX, centerY, this.objRadius, 0, 2 * Math.PI, true)
+    context.closePath()
+    context.stroke();
+  }
+
+  drawPlayer (player: [number, number, number, string]) {
+    const context = this.context as CanvasRenderingContext2D
+    // 円を描画
+    context.strokeStyle = player[3];
+    context.fillStyle = player[3];
+    context.lineWidth = 5;
+    context.beginPath();
+    context.arc(player[1], player[2], this.objRadius, 0, 2 * Math.PI, true)
+    context.closePath()
+    context.fill();
+    // 文字（数字）を描画
+    context.font = 'bold 32px sans-serif'
+    context.textBaseline = "middle"
+    context.textAlign = "center"
+    context.fillStyle = "white"
+    context.fillText(String(player[0]), player[1], player[2])
+  }
+
+  drawObjects() {
     this.context?.clearRect(0,0,1920,3000)
     this.context?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
     for (let player of this.players.slice().reverse()) {
-      this.drawPlayer(player)
+      this.drawObject(player)
     }
   }
 
@@ -124,7 +169,7 @@ export default class Board extends Vue {
     if (this.isDrag) {
       this.players[0].splice(1,1, mouseX - this.dx)
       this.players[0].splice(2,1,mouseY - this.dy)
-      this.drawPlayers()
+      this.drawObjects()
     }
     for (let i = 0; i < this.players.length; i++) {
       let player = this.players[i]
@@ -152,12 +197,11 @@ export default class Board extends Vue {
   undo () {
     let i: number = this.undoIndex
     this.players = JSON.parse(JSON.stringify(this.historyList[i]))
-    this.drawPlayers()
+    this.drawObjects()
     this.undoIndex += 1
   }
 
   get isUndo () {
-    console.log(this.historyList.length, this.undoIndex)
     return this.historyList.length <= this.undoIndex
   }
 
@@ -179,13 +223,13 @@ export default class Board extends Vue {
     this.canvas.height = <number>this.container?.clientHeight
     let width = this.canvas.clientWidth
     this.image.src = "image/futtech_board.png"
-    this.ball.src = "image/ball.svg"
+    // this.ball.src = "image/ball.svg"
     this.image.onload = () => {
 
       this.scale = width / this.image.width
       this.imageScale = this.scale
       this.context?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
-      this.drawPlayers()
+      this.drawObjects()
       this.dlLink = document.querySelector('#download')
       this.dlLink!.download = "フットテック";
     }
@@ -196,7 +240,7 @@ export default class Board extends Vue {
       // this.canvas.width = this.container.clientWidth
       // this.context.setTransform(this.scale,0,0,this.scale,0,0)
       // this.context.drawImage(this.image, 0, 0)
-      // this.drawPlayer()
+      // this.drawObject()
     }
     this.historyList.unshift(JSON.parse(JSON.stringify(this.players)))
   }
