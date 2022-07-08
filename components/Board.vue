@@ -202,7 +202,6 @@ export default class Board extends Vue {
   }
 
   get isUndo () {
-    console.log(this.historyList.length, this.undoIndex)
     return this.historyList.length <= this.undoIndex
   }
 
