@@ -37,7 +37,7 @@ export default class Board extends Vue {
   dlLink: HTMLAnchorElement | null = null
   undoIndex: number = 1
   historyList: [number, number, number, string][][] = []
-  players: [number, number, number, string][] = [
+  objects: [number, number, number, string][] = [
     [1, 200, 435, '#ed230c'], [2, 500, 95, '#ed230c'], [3, 400, 435, '#ed230c'], [4, 540, 795, '#ed230c'], [5, 1300, 435, '#ed230c'],
     [1, 1700, 435, '#09a1ff'], [2, 800, 95, '#09a1ff'], [3, 1500, 435, '#09a1ff'], [4, 800, 795, '#09a1ff'], [5, 700, 435, '#09a1ff'],
     [0, 500, 435, '#09a1ff']
@@ -118,7 +118,7 @@ export default class Board extends Vue {
   drawObjects() {
     this.context?.clearRect(0,0,1920,3000)
     this.context?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
-    for (let player of this.players.slice().reverse()) {
+    for (let player of this.objects.slice().reverse()) {
       this.drawObject(player)
     }
   }
@@ -135,17 +135,17 @@ export default class Board extends Vue {
       mouseX = (event as MouseEvent).pageX / this.scale
       mouseY = ((event as MouseEvent).pageY)/ this.scale
     }
-    for (let i = 0; i < this.players.length; i++) {
-      let player = this.players[i]
+    for (let i = 0; i < this.objects.length; i++) {
+      let player = this.objects[i]
       // マウスがオブジェクト上にあるか判定
       let dx = player[1] - mouseX
       let dy = player[2] - mouseY
       if (dx**2 + dy**2 < this.objRadius**2) {
         this.isDrag = true
-        this.players.unshift(player)
-        this.players.splice(i + 1, 1);
-        this.dx = mouseX - this.players[0][1]
-        this.dy = mouseY - this.players[0][2]
+        this.objects.unshift(player)
+        this.objects.splice(i + 1, 1);
+        this.dx = mouseX - this.objects[0][1]
+        this.dy = mouseY - this.objects[0][2]
         return
       } else {
         this.isDrag = false
@@ -166,12 +166,12 @@ export default class Board extends Vue {
     }
 
     if (this.isDrag) {
-      this.players[0].splice(1,1, mouseX - this.dx)
-      this.players[0].splice(2,1,mouseY - this.dy)
+      this.objects[0].splice(1,1, mouseX - this.dx)
+      this.objects[0].splice(2,1,mouseY - this.dy)
       this.drawObjects()
     }
-    for (let i = 0; i < this.players.length; i++) {
-      let player = this.players[i]
+    for (let i = 0; i < this.objects.length; i++) {
+      let player = this.objects[i]
       // マウスがオブジェクト上にあるか判定
       let dx = player[1] - mouseX
       let dy = player[2] - mouseY
@@ -186,7 +186,7 @@ export default class Board extends Vue {
   mouseUp() {
     if (this.isDrag) {
       this.historyList.splice(0,this.undoIndex - 1)
-      this.historyList.unshift(JSON.parse(JSON.stringify(this.players)))
+      this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
       this.undoIndex = 1
       this.isDrag = false
     }
@@ -195,7 +195,7 @@ export default class Board extends Vue {
 
   undo () {
     let i: number = this.undoIndex
-    this.players = JSON.parse(JSON.stringify(this.historyList[i]))
+    this.objects = JSON.parse(JSON.stringify(this.historyList[i]))
     this.drawObjects()
     this.undoIndex += 1
   }
@@ -240,7 +240,7 @@ export default class Board extends Vue {
       // this.context.drawImage(this.image, 0, 0)
       // this.drawObject()
     }
-    this.historyList.unshift(JSON.parse(JSON.stringify(this.players)))
+    this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
   }
 
 }
