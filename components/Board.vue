@@ -47,7 +47,6 @@ export default class Board extends Vue {
   dx: number = 0
   dy: number = 0
   image: HTMLImageElement = new Image
-  ball: HTMLImageElement = new Image
 
   drawObject(player: [number, number, number, string]) {
     if (player[0] === 0) {
@@ -223,7 +222,6 @@ export default class Board extends Vue {
     this.canvas.height = <number>this.container?.clientHeight
     let width = this.canvas.clientWidth
     this.image.src = "image/futtech_board.png"
-    // this.ball.src = "image/ball.svg"
     this.image.onload = () => {
 
       this.scale = width / this.image.width
