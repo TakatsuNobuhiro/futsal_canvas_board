@@ -188,16 +188,18 @@ export default class Board extends Vue {
       this.historyList.splice(0,this.undoIndex - 1)
       this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
       this.undoIndex = 1
+      localStorage.setItem('undoIndex', this.undoIndex.toString())
       this.isDrag = false
+      localStorage.setItem('historyList', JSON.stringify(this.historyList))
     }
     this.dlLink!.href = this.canvas?.toDataURL() as string
   }
 
   undo () {
-    let i: number = this.undoIndex
-    this.objects = JSON.parse(JSON.stringify(this.historyList[i]))
+    this.objects = JSON.parse(JSON.stringify(this.historyList[this.undoIndex]))
     this.drawObjects()
     this.undoIndex += 1
+    localStorage.setItem('undoIndex', this.undoIndex.toString())
   }
 
   get isUndo () {
@@ -227,7 +229,16 @@ export default class Board extends Vue {
       this.scale = width / this.image.width
       this.imageScale = this.scale
       this.context?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
-      this.drawObjects()
+      const savedHistoryList: string | null = localStorage.getItem('historyList')
+      if (savedHistoryList){
+        this.historyList = JSON.parse(savedHistoryList)
+        this.undoIndex = Number(localStorage.getItem('undoIndex'))
+        this.objects = JSON.parse(JSON.stringify(this.historyList[this.undoIndex - 1]))
+        this.drawObjects()
+      } else{
+        this.drawObjects()
+        this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
+      }
       this.dlLink = document.querySelector('#download')
       this.dlLink!.download = "フットテック";
     }
@@ -240,9 +251,7 @@ export default class Board extends Vue {
       // this.context.drawImage(this.image, 0, 0)
       // this.drawObject()
     }
-    this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
   }
-
 }
 </script>
 
