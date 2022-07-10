@@ -188,7 +188,9 @@ export default class Board extends Vue {
       this.historyList.splice(0,this.undoIndex - 1)
       this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
       this.undoIndex = 1
+      localStorage.setItem('undoIndex', this.undoIndex.toString())
       this.isDrag = false
+      localStorage.setItem('historyList', JSON.stringify(this.historyList))
     }
     this.dlLink!.href = this.canvas?.toDataURL() as string
   }
@@ -197,6 +199,7 @@ export default class Board extends Vue {
     this.objects = JSON.parse(JSON.stringify(this.historyList[this.undoIndex]))
     this.drawObjects()
     this.undoIndex += 1
+    localStorage.setItem('undoIndex', this.undoIndex.toString())
   }
 
   get isUndo () {
