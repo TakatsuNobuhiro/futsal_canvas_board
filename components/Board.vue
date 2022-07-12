@@ -12,6 +12,7 @@
 
         @touchend="mouseUp"
         @mouseup="mouseUp"
+        @mouseout="mouseUp"
       />
     </div>
     <div>
