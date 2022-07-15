@@ -1,8 +1,9 @@
 <template>
   <div>
     <div id="canvas-container" class="canvas-container">
+      <canvas id="base-canvas"></canvas>
       <canvas
-        id="canvas"
+        id="objects-canvas"
         class="canvas"
         @touchstart.prevent="mouseDown"
         @mousedown="mouseDown"
@@ -32,7 +33,9 @@ export default class Board extends Vue {
   device: string = ''
   container: HTMLElement | null = null
   canvas: HTMLCanvasElement | null = null
+  baseCanvas: HTMLCanvasElement | null = null
   context: CanvasRenderingContext2D | null = null
+  baseCanvasContext: CanvasRenderingContext2D | null = null
   scale: number = 0
   imageScale: number = 0
   dlLink: HTMLAnchorElement | null = null
@@ -118,7 +121,7 @@ export default class Board extends Vue {
 
   drawObjects() {
     this.context?.clearRect(0,0,1920,3000)
-    this.context?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
+    // this.context?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
     for (let player of this.objects.slice().reverse()) {
       this.drawObject(player)
     }
@@ -193,6 +196,9 @@ export default class Board extends Vue {
       this.isDrag = false
       localStorage.setItem('historyList', JSON.stringify(this.historyList))
     }
+    const dummyCanvas = document.createElement('canvas').getContext('2d')
+    dummyCanvas?.putImageData((this.baseCanvasContext as CanvasRenderingContext2D).getImageData(0,0,1920,975),0,0)
+    dummyCanvas?.putImageData((this.context as CanvasRenderingContext2D).getImageData(0,0,1920,975),0,0)
     this.dlLink!.href = this.canvas?.toDataURL() as string
   }
 
@@ -219,10 +225,20 @@ export default class Board extends Vue {
     }
 
     this.container = document.querySelector<HTMLElement>('#canvas-container')
-    this.canvas = document.querySelector<HTMLElement>('#canvas') as HTMLCanvasElement
+    this.canvas = document.querySelector<HTMLElement>('#objects-canvas') as HTMLCanvasElement
+    this.baseCanvas = document.querySelector<HTMLElement>('#base-canvas') as HTMLCanvasElement
+
+    const containerWidth = <number>this.container?.clientWidth
+    const containerHeight = <number>this.container?.clientHeight
+
     this.context = this.canvas.getContext('2d')
-    this.canvas.width = <number>this.container?.clientWidth
-    this.canvas.height = <number>this.container?.clientHeight
+    this.canvas.width = containerWidth
+    this.canvas.height = containerHeight
+
+    this.baseCanvasContext = this.baseCanvas.getContext('2d')
+    this.baseCanvas.width = containerWidth
+    this.baseCanvas.height = containerHeight
+
     let width = this.canvas.clientWidth
     this.image.src = "image/futtech_board.png"
     this.image.onload = () => {
@@ -230,6 +246,8 @@ export default class Board extends Vue {
       this.scale = width / this.image.width
       this.imageScale = this.scale
       this.context?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
+      this.baseCanvasContext?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
+      this.baseCanvasContext?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
       const savedHistoryList: string | null = localStorage.getItem('historyList')
       if (savedHistoryList){
         this.historyList = JSON.parse(savedHistoryList)
@@ -265,7 +283,7 @@ export default class Board extends Vue {
   user-select: none;
 }
 
-.canvas {
+canvas {
   position: absolute;
   top: 0;
   left: 0;
@@ -275,5 +293,13 @@ export default class Board extends Vue {
   /*background-image: url("/image/board.png");*/
   /*background-size: contain;*/
   /*background-repeat: no-repeat;*/
+}
+
+#objects-canvas{
+  z-index: 3;
+}
+
+#base-canvas{
+  z-index: 1;
 }
 </style>
