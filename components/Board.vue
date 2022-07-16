@@ -200,6 +200,10 @@ export default class Board extends Vue {
       this.isDrag = false
       localStorage.setItem('historyList', JSON.stringify(this.historyList))
     }
+    this.updateDummyImage()
+  }
+
+  updateDummyImage () {
     this.drawBoardImage(this.dummyCanvasContext)
     this.drawObjects(this.dummyCanvasContext, false)
     this.dlLink!.href = this.dummyCanvas?.toDataURL() as string
@@ -210,6 +214,7 @@ export default class Board extends Vue {
     this.drawObjects(this.context)
     this.undoIndex += 1
     localStorage.setItem('undoIndex', this.undoIndex.toString())
+    this.updateDummyImage()
   }
 
   get isUndo () {
