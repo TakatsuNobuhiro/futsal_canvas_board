@@ -1,6 +1,7 @@
 <template>
   <div>
     <div id="canvas-container" class="canvas-container">
+      <canvas id="dummy-canvas"></canvas>
       <canvas id="base-canvas"></canvas>
       <canvas
         id="objects-canvas"
@@ -34,8 +35,10 @@ export default class Board extends Vue {
   container: HTMLElement | null = null
   canvas: HTMLCanvasElement | null = null
   baseCanvas: HTMLCanvasElement | null = null
+  dummyCanvas: HTMLCanvasElement | null = null
   context: CanvasRenderingContext2D | null = null
   baseCanvasContext: CanvasRenderingContext2D | null = null
+  dummyCanvasContext: CanvasRenderingContext2D | null = null
   scale: number = 0
   imageScale: number = 0
   dlLink: HTMLAnchorElement | null = null
@@ -52,16 +55,16 @@ export default class Board extends Vue {
   dy: number = 0
   image: HTMLImageElement = new Image
 
-  drawObject(player: [number, number, number, string]) {
+  drawObject(player: [number, number, number, string], context: CanvasRenderingContext2D | null) {
     if (player[0] === 0) {
-      this.drawBall(player)
+      this.drawBall(player, context)
     } else {
-      this.drawPlayer(player)
+      this.drawPlayer(player, context)
     }
   }
 
-  drawBall (player: [number, number, number, string]) {
-    const context = this.context as CanvasRenderingContext2D
+  drawBall (player: [number, number, number, string], ctx: CanvasRenderingContext2D | null) {
+    const context = ctx as CanvasRenderingContext2D
     context.strokeStyle = 'black';
     context.fillStyle = 'black';
     context.lineWidth = 3;
@@ -101,8 +104,8 @@ export default class Board extends Vue {
     context.stroke();
   }
 
-  drawPlayer (player: [number, number, number, string]) {
-    const context = this.context as CanvasRenderingContext2D
+  drawPlayer (player: [number, number, number, string], ctx: CanvasRenderingContext2D | null) {
+    const context = ctx as CanvasRenderingContext2D
     // 円を描画
     context.strokeStyle = player[3];
     context.fillStyle = player[3];
@@ -119,11 +122,12 @@ export default class Board extends Vue {
     context.fillText(String(player[0]), player[1], player[2])
   }
 
-  drawObjects() {
-    this.context?.clearRect(0,0,1920,3000)
-    // this.context?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
+  drawObjects(context: CanvasRenderingContext2D | null, isClear: boolean = true) {
+    if (isClear){
+      context?.clearRect(0,0,1920,3000)
+    }
     for (let player of this.objects.slice().reverse()) {
-      this.drawObject(player)
+      this.drawObject(player, context)
     }
   }
 
@@ -172,7 +176,7 @@ export default class Board extends Vue {
     if (this.isDrag) {
       this.objects[0].splice(1,1, mouseX - this.dx)
       this.objects[0].splice(2,1,mouseY - this.dy)
-      this.drawObjects()
+      this.drawObjects(this.context)
     }
     for (let i = 0; i < this.objects.length; i++) {
       let player = this.objects[i]
@@ -196,21 +200,24 @@ export default class Board extends Vue {
       this.isDrag = false
       localStorage.setItem('historyList', JSON.stringify(this.historyList))
     }
-    const dummyCanvas = document.createElement('canvas').getContext('2d')
-    dummyCanvas?.putImageData((this.baseCanvasContext as CanvasRenderingContext2D).getImageData(0,0,1920,975),0,0)
-    dummyCanvas?.putImageData((this.context as CanvasRenderingContext2D).getImageData(0,0,1920,975),0,0)
-    this.dlLink!.href = this.canvas?.toDataURL() as string
+    this.drawBoardImage(this.dummyCanvasContext)
+    this.drawObjects(this.dummyCanvasContext, false)
+    this.dlLink!.href = this.dummyCanvas?.toDataURL() as string
   }
 
   undo () {
     this.objects = JSON.parse(JSON.stringify(this.historyList[this.undoIndex]))
-    this.drawObjects()
+    this.drawObjects(this.context)
     this.undoIndex += 1
     localStorage.setItem('undoIndex', this.undoIndex.toString())
   }
 
   get isUndo () {
     return this.historyList.length <= this.undoIndex
+  }
+
+  drawBoardImage (context: CanvasRenderingContext2D | null) {
+    context?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
   }
 
   mounted() {
@@ -227,6 +234,7 @@ export default class Board extends Vue {
     this.container = document.querySelector<HTMLElement>('#canvas-container')
     this.canvas = document.querySelector<HTMLElement>('#objects-canvas') as HTMLCanvasElement
     this.baseCanvas = document.querySelector<HTMLElement>('#base-canvas') as HTMLCanvasElement
+    this.dummyCanvas = document.querySelector<HTMLElement>('#dummy-canvas') as HTMLCanvasElement
 
     const containerWidth = <number>this.container?.clientWidth
     const containerHeight = <number>this.container?.clientHeight
@@ -239,6 +247,10 @@ export default class Board extends Vue {
     this.baseCanvas.width = containerWidth
     this.baseCanvas.height = containerHeight
 
+    this.dummyCanvasContext = this.dummyCanvas.getContext('2d')
+    this.dummyCanvas.width = containerWidth
+    this.dummyCanvas.height = containerHeight
+
     let width = this.canvas.clientWidth
     this.image.src = "image/futtech_board.png"
     this.image.onload = () => {
@@ -247,15 +259,16 @@ export default class Board extends Vue {
       this.imageScale = this.scale
       this.context?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
       this.baseCanvasContext?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
-      this.baseCanvasContext?.drawImage(this.image, 0, 105,1920,975,0,0,1920,975)
+      this.dummyCanvasContext?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
+      this.drawBoardImage(this.baseCanvasContext)
       const savedHistoryList: string | null = localStorage.getItem('historyList')
       if (savedHistoryList){
         this.historyList = JSON.parse(savedHistoryList)
         this.undoIndex = Number(localStorage.getItem('undoIndex'))
         this.objects = JSON.parse(JSON.stringify(this.historyList[this.undoIndex - 1]))
-        this.drawObjects()
+        this.drawObjects(this.context)
       } else{
-        this.drawObjects()
+        this.drawObjects(this.context)
         this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
       }
       this.dlLink = document.querySelector('#download')
@@ -263,12 +276,7 @@ export default class Board extends Vue {
     }
 
     window.onresize = () => {
-      // this.canvas.height = this.container.clientHeight
       this.scale = (this.canvas as HTMLElement).clientWidth / this.image.width
-      // this.canvas.width = this.container.clientWidth
-      // this.context.setTransform(this.scale,0,0,this.scale,0,0)
-      // this.context.drawImage(this.image, 0, 0)
-      // this.drawObject()
     }
   }
 }
@@ -301,5 +309,9 @@ canvas {
 
 #base-canvas{
   z-index: 1;
+}
+
+#dummy-canvas{
+  z-index: -1;
 }
 </style>
