@@ -16,10 +16,18 @@
         @mouseup="mouseUp"
         @mouseout="mouseUp"
       />
+      <canvas id="paint-canvas"></canvas>
     </div>
     <div>
-      <a class="btn btn-primary" id="download" href="">画像をダウンロード</a>
-      <button class="btn btn-success" @click="undo" :disabled="isUndo" >一つ戻る</button>
+      <a class="btn btn-info" id="download" href="">画像をダウンロード</a>
+      <button class="btn btn-warning" @click="undo" :disabled="isUndo" >一つ戻る</button>
+      <button class="btn btn-secondary" @click="dragMode">ドラッグモード</button>
+      <button class="btn btn-dark" @click="penBlack">黒ペン</button>
+      <button class="btn btn-danger" @click="penRed">赤ペン</button>
+      <button class="btn btn-primary" @click="penBlue">青ペン</button>
+      <button class="btn btn-success" @click="penGreen">緑ペン</button>
+      <button class="btn btn-light" @click="eraser">消しゴム</button>
+      <button class="btn btn-light" @click="clearPaint">クリア</button>
     </div>
   </div>
 </template>
@@ -35,10 +43,12 @@ export default class Board extends Vue {
   container: HTMLElement | null = null
   canvas: HTMLCanvasElement | null = null
   baseCanvas: HTMLCanvasElement | null = null
+  paintCanvas: HTMLCanvasElement | null = null
   dummyCanvas: HTMLCanvasElement | null = null
   context: CanvasRenderingContext2D | null = null
   baseCanvasContext: CanvasRenderingContext2D | null = null
   dummyCanvasContext: CanvasRenderingContext2D | null = null
+  paintCanvasContext: CanvasRenderingContext2D | null = null
   scale: number = 0
   imageScale: number = 0
   dlLink: HTMLAnchorElement | null = null
@@ -54,6 +64,59 @@ export default class Board extends Vue {
   dx: number = 0
   dy: number = 0
   image: HTMLImageElement = new Image
+  canvasMode: string = 'drag'
+  isPaint: boolean = false
+
+  dragMode () {
+    this.canvasMode = 'drag'
+  }
+
+  setPen (lineWidth: number) {
+    const ctx = this.paintCanvasContext as CanvasRenderingContext2D
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = lineWidth;
+  }
+
+  penBlack () {
+    const ctx = this.paintCanvasContext as CanvasRenderingContext2D
+    this.setPen(5)
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = '#000000';
+    this.canvasMode = 'paint'
+  }
+  penRed () {
+    const ctx = this.paintCanvasContext as CanvasRenderingContext2D
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = 'red';
+    this.setPen(5)
+    this.canvasMode = 'paint'
+  }
+
+  penBlue () {
+    const ctx = this.paintCanvasContext as CanvasRenderingContext2D
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = 'blue';
+    this.setPen(5)
+    this.canvasMode = 'paint'
+  }
+
+  penGreen () {
+    const ctx = this.paintCanvasContext as CanvasRenderingContext2D
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = 'green';
+    this.setPen(5)
+    this.canvasMode = 'paint'
+  }
+  eraser () {
+    (this.paintCanvasContext as CanvasRenderingContext2D).globalCompositeOperation = 'destination-out'
+    this.setPen(30)
+    this.canvasMode = 'paint'
+  }
+
+  clearPaint () {
+    (this.paintCanvasContext as CanvasRenderingContext2D).clearRect(0,0,1920,3000)
+  }
 
   drawObject(player: [number, number, number, string], context: CanvasRenderingContext2D | null) {
     if (player[0] === 0) {
@@ -143,21 +206,29 @@ export default class Board extends Vue {
       mouseX = (event as MouseEvent).pageX / this.scale
       mouseY = ((event as MouseEvent).pageY)/ this.scale
     }
-    for (let i = 0; i < this.objects.length; i++) {
-      let player = this.objects[i]
-      // マウスがオブジェクト上にあるか判定
-      let dx = player[1] - mouseX
-      let dy = player[2] - mouseY
-      if (dx**2 + dy**2 < this.objRadius**2) {
-        this.isDrag = true
-        this.objects.unshift(player)
-        this.objects.splice(i + 1, 1);
-        this.dx = mouseX - this.objects[0][1]
-        this.dy = mouseY - this.objects[0][2]
-        return
-      } else {
-        this.isDrag = false
+    if (this.canvasMode === 'drag'){
+      for (let i = 0; i < this.objects.length; i++) {
+        let player = this.objects[i]
+        // マウスがオブジェクト上にあるか判定
+        let dx = player[1] - mouseX
+        let dy = player[2] - mouseY
+        if (dx**2 + dy**2 < this.objRadius**2) {
+          this.isDrag = true
+          this.objects.unshift(player)
+          this.objects.splice(i + 1, 1);
+          this.dx = mouseX - this.objects[0][1]
+          this.dy = mouseY - this.objects[0][2]
+          return
+        } else {
+          this.isDrag = false
+        }
       }
+    }else if (this.canvasMode === 'paint'){
+      const ctx = this.paintCanvasContext as CanvasRenderingContext2D
+      ctx.beginPath()
+      ctx.lineTo(mouseX, mouseY)
+      ctx.stroke()
+      this.isPaint = true
     }
   }
 
@@ -178,15 +249,20 @@ export default class Board extends Vue {
       this.objects[0].splice(2,1,mouseY - this.dy)
       this.drawObjects(this.context)
     }
-    for (let i = 0; i < this.objects.length; i++) {
-      let player = this.objects[i]
-      // マウスがオブジェクト上にあるか判定
-      let dx = player[1] - mouseX
-      let dy = player[2] - mouseY
-      if (dx**2 + dy**2 < this.objRadius**2) {
-        this.canvas!.style.cursor = 'move'
-        return
+    if (this.canvasMode === 'drag'){
+      for (let i = 0; i < this.objects.length; i++) {
+        let player = this.objects[i]
+        // マウスがオブジェクト上にあるか判定
+        let dx = player[1] - mouseX
+        let dy = player[2] - mouseY
+        if (dx**2 + dy**2 < this.objRadius**2) {
+          this.canvas!.style.cursor = 'move'
+          return
+        }
       }
+    } else if(this.isPaint){
+      this.paintCanvasContext?.lineTo(mouseX, mouseY)
+      this.paintCanvasContext?.stroke()
     }
     this.canvas!.style.cursor = 'default'
   }
@@ -199,6 +275,10 @@ export default class Board extends Vue {
       localStorage.setItem('undoIndex', this.undoIndex.toString())
       this.isDrag = false
       localStorage.setItem('historyList', JSON.stringify(this.historyList))
+    }
+    if (this.isPaint){
+      this.paintCanvasContext?.closePath()
+      this.isPaint = false
     }
     this.updateDummyImage()
   }
@@ -240,6 +320,7 @@ export default class Board extends Vue {
     this.canvas = document.querySelector<HTMLElement>('#objects-canvas') as HTMLCanvasElement
     this.baseCanvas = document.querySelector<HTMLElement>('#base-canvas') as HTMLCanvasElement
     this.dummyCanvas = document.querySelector<HTMLElement>('#dummy-canvas') as HTMLCanvasElement
+    this.paintCanvas = document.querySelector<HTMLElement>('#paint-canvas') as HTMLCanvasElement
 
     const containerWidth = <number>this.container?.clientWidth
     const containerHeight = <number>this.container?.clientHeight
@@ -256,6 +337,10 @@ export default class Board extends Vue {
     this.dummyCanvas.width = containerWidth
     this.dummyCanvas.height = containerHeight
 
+    this.paintCanvasContext = this.paintCanvas.getContext('2d')
+    this.paintCanvas.width = containerWidth
+    this.paintCanvas.height = containerHeight
+
     let width = this.canvas.clientWidth
     this.image.src = "image/futtech_board.png"
     this.image.onload = () => {
@@ -265,6 +350,7 @@ export default class Board extends Vue {
       this.context?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
       this.baseCanvasContext?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
       this.dummyCanvasContext?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
+      this.paintCanvasContext?.setTransform(this.scale, 0, 0, this.scale, 0, 0)
       this.drawBoardImage(this.baseCanvasContext)
       const savedHistoryList: string | null = localStorage.getItem('historyList')
       if (savedHistoryList){
@@ -314,6 +400,10 @@ canvas {
 
 #base-canvas{
   z-index: 1;
+}
+
+#paint-canvas{
+  z-index: 2;
 }
 
 #dummy-canvas{
