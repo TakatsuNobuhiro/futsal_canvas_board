@@ -34,7 +34,6 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-// import { getDatabase, ref, onValue} from "firebase/database";
 
 @Component({
 })
@@ -306,9 +305,6 @@ export default class Board extends Vue {
   }
 
   mounted() {
-    // スマホでのタッチ操作でのスクロール禁止
-    // document.addEventListener("touchmove",(event: TouchEvent) => { event.preventDefault() }, { passive: false });
-
     const userAgent = navigator.userAgent;
     if(userAgent.indexOf('iPhone') > 0 || userAgent.indexOf('iPod') > 0 || userAgent.indexOf('Android') > 0 && userAgent.indexOf('Mobile') > 0 || userAgent.indexOf('iPad') > 0){
       this.device = 'mobile'
