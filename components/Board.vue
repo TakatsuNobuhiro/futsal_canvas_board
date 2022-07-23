@@ -34,7 +34,6 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-// import { getDatabase, ref, onValue} from "firebase/database";
 
 @Component({
 })
@@ -53,8 +52,8 @@ export default class Board extends Vue {
   imageScale: number = 0
   dlLink: HTMLAnchorElement | null = null
   undoIndex: number = 1
-  historyList: [number, number, number, string][][] = []
-  objects: [number, number, number, string][] = [
+  historyList: Player[][] = []
+  objects: Player[] = [
     [1, 200, 435, '#ed230c'], [2, 500, 95, '#ed230c'], [3, 400, 435, '#ed230c'], [4, 540, 795, '#ed230c'], [5, 1300, 435, '#ed230c'],
     [1, 1700, 435, '#09a1ff'], [2, 800, 95, '#09a1ff'], [3, 1500, 435, '#09a1ff'], [4, 800, 795, '#09a1ff'], [5, 700, 435, '#09a1ff'],
     [0, 500, 435, '#09a1ff']
@@ -118,7 +117,7 @@ export default class Board extends Vue {
     (this.paintCanvasContext as CanvasRenderingContext2D).clearRect(0,0,1920,3000)
   }
 
-  drawObject(player: [number, number, number, string], context: CanvasRenderingContext2D | null) {
+  drawObject(player: Player, context: CanvasRenderingContext2D | null) {
     if (player[0] === 0) {
       this.drawBall(player, context)
     } else {
@@ -126,7 +125,7 @@ export default class Board extends Vue {
     }
   }
 
-  drawBall (player: [number, number, number, string], ctx: CanvasRenderingContext2D | null) {
+  drawBall (player: Player, ctx: CanvasRenderingContext2D | null) {
     const context = ctx as CanvasRenderingContext2D
     context.strokeStyle = 'black';
     context.fillStyle = 'black';
@@ -167,7 +166,7 @@ export default class Board extends Vue {
     context.stroke();
   }
 
-  drawPlayer (player: [number, number, number, string], ctx: CanvasRenderingContext2D | null) {
+  drawPlayer (player: Player, ctx: CanvasRenderingContext2D | null) {
     const context = ctx as CanvasRenderingContext2D
     // 円を描画
     context.strokeStyle = player[3];
@@ -306,9 +305,6 @@ export default class Board extends Vue {
   }
 
   mounted() {
-    // スマホでのタッチ操作でのスクロール禁止
-    // document.addEventListener("touchmove",(event: TouchEvent) => { event.preventDefault() }, { passive: false });
-
     const userAgent = navigator.userAgent;
     if(userAgent.indexOf('iPhone') > 0 || userAgent.indexOf('iPod') > 0 || userAgent.indexOf('Android') > 0 && userAgent.indexOf('Mobile') > 0 || userAgent.indexOf('iPad') > 0){
       this.device = 'mobile'
