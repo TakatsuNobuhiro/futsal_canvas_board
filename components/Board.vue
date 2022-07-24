@@ -34,11 +34,11 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
+import customer from '~/store/customer'
 
 @Component({
 })
 export default class Board extends Vue {
-  device: string = ''
   container: HTMLElement | null = null
   canvas: HTMLCanvasElement | null = null
   baseCanvas: HTMLCanvasElement | null = null
@@ -197,7 +197,7 @@ export default class Board extends Vue {
   mouseDown(event: MouseEvent | TouchEvent) {
     let mouseX: number
     let mouseY: number
-    if (this.device === 'mobile'){
+    if (customer.state.device === 'mobile'){
       const touch_event = (event as TouchEvent).changedTouches[0]
       mouseX = touch_event.pageX / this.scale
       mouseY = (touch_event.pageY) / this.scale
@@ -234,7 +234,7 @@ export default class Board extends Vue {
   mouseMove(event: MouseEvent | TouchEvent) {
     let mouseX: number
     let mouseY: number
-    if (this.device === 'mobile'){
+    if (customer.state.device === 'mobile'){
       const touch_event = (event as TouchEvent).changedTouches[0]
       mouseX = touch_event.pageX / this.scale
       mouseY = (touch_event.pageY)/ this.scale
@@ -307,9 +307,9 @@ export default class Board extends Vue {
   mounted() {
     const userAgent = navigator.userAgent;
     if(userAgent.indexOf('iPhone') > 0 || userAgent.indexOf('iPod') > 0 || userAgent.indexOf('Android') > 0 && userAgent.indexOf('Mobile') > 0 || userAgent.indexOf('iPad') > 0){
-      this.device = 'mobile'
+      customer.state.device = 'mobile'
     } else {
-      this.device = 'desktop'
+      customer.state.device = 'desktop'
     }
 
     this.container = document.querySelector<HTMLElement>('#canvas-container')
