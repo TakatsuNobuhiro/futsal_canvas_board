@@ -28,6 +28,7 @@
       <button class="btn btn-success" @click="penGreen">緑ペン</button>
       <button class="btn btn-light" @click="eraser">消しゴム</button>
       <button class="btn btn-light" @click="clearPaint">クリア</button>
+      <button class="btn btn-primary" @click="change3_1">3-1</button>
     </div>
   </div>
 </template>
@@ -68,6 +69,21 @@ export default class Board extends Vue {
 
   dragMode () {
     this.canvasMode = 'drag'
+  }
+
+  change3_1 () {
+    this.objects = [
+      [1, 200, 435, '#ed230c'], [2, 500, 95, '#ed230c'], [3, 400, 435, '#ed230c'], [4, 540, 795, '#ed230c'], [5, 1300, 435, '#ed230c'],
+      [1, 1700, 435, '#09a1ff'], [2, 800, 95, '#09a1ff'], [3, 1500, 435, '#09a1ff'], [4, 800, 795, '#09a1ff'], [5, 700, 435, '#09a1ff'],
+      [0, 500, 435, '#09a1ff']
+    ]
+    this.drawObjects(this.context)
+    this.historyList.splice(0,this.undoIndex - 1)
+    this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
+    this.undoIndex = 1
+    localStorage.setItem('undoIndex', this.undoIndex.toString())
+    this.isDrag = false
+    localStorage.setItem('historyList', JSON.stringify(this.historyList))
   }
 
   setPen (lineWidth: number) {
