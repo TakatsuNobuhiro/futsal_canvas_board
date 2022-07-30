@@ -21,12 +21,14 @@
     <div>
       <a class="btn btn-info" id="download" href="">画像をダウンロード</a>
       <button class="btn btn-warning" @click="undo" :disabled="isUndo" >一つ戻る</button>
-      <button class="btn btn-secondary" @click="dragMode">ドラッグモード</button>
-      <button class="btn btn-dark" @click="penBlack">黒ペン</button>
-      <button class="btn btn-danger" @click="penRed">赤ペン</button>
-      <button class="btn btn-primary" @click="penBlue">青ペン</button>
-      <button class="btn btn-success" @click="penGreen">緑ペン</button>
-      <button class="btn btn-light" @click="eraser">消しゴム</button>
+      <b-dropdown id="dropdown-dropup" dropup :text="buttonName" variant="primary" class="m-2">
+        <b-dropdown-item @click="dragMode">ドラッグモード</b-dropdown-item>
+        <b-dropdown-item @click="penBlack">黒ペン</b-dropdown-item>
+        <b-dropdown-item @click="penRed">赤ペン</b-dropdown-item>
+        <b-dropdown-item @click="penBlue">青ペン</b-dropdown-item>
+        <b-dropdown-item @click="penGreen">緑ペン</b-dropdown-item>
+        <b-dropdown-item @click="eraser">消しゴム</b-dropdown-item>
+      </b-dropdown>
       <button class="btn btn-light" @click="clearPaint">クリア</button>
       <button class="btn btn-primary" @click="change3_1">3-1</button>
     </div>
@@ -65,10 +67,12 @@ export default class Board extends Vue {
   dy: number = 0
   image: HTMLImageElement = new Image
   canvasMode: string = 'drag'
+  buttonName: string = 'ドラッグモード'
   isPaint: boolean = false
 
   dragMode () {
     this.canvasMode = 'drag'
+    this.buttonName = 'ドラッグモード'
   }
 
   change3_1 () {
@@ -99,6 +103,7 @@ export default class Board extends Vue {
     ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = '#000000';
     this.canvasMode = 'paint'
+    this.buttonName = '黒ペン'
   }
   penRed () {
     const ctx = this.paintCanvasContext as CanvasRenderingContext2D
@@ -106,6 +111,7 @@ export default class Board extends Vue {
     ctx.strokeStyle = 'red';
     this.setPen(5)
     this.canvasMode = 'paint'
+    this.buttonName = '赤ペン'
   }
 
   penBlue () {
@@ -114,6 +120,7 @@ export default class Board extends Vue {
     ctx.strokeStyle = 'blue';
     this.setPen(5)
     this.canvasMode = 'paint'
+    this.buttonName = '青ペン'
   }
 
   penGreen () {
@@ -122,11 +129,13 @@ export default class Board extends Vue {
     ctx.strokeStyle = 'green';
     this.setPen(5)
     this.canvasMode = 'paint'
+    this.buttonName = '緑ペン'
   }
   eraser () {
     (this.paintCanvasContext as CanvasRenderingContext2D).globalCompositeOperation = 'destination-out'
     this.setPen(30)
     this.canvasMode = 'paint'
+    this.buttonName = '消しゴム'
   }
 
   clearPaint () {
