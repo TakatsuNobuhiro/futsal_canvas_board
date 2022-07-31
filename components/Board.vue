@@ -21,7 +21,7 @@
     <div>
       <a class="btn btn-info" id="download" href="">画像をダウンロード</a>
       <button class="btn btn-warning" @click="undo" :disabled="isUndo" >一つ戻る</button>
-      <b-dropdown id="dropdown-dropup" dropup :text="buttonName" variant="primary" class="m-2">
+      <b-dropdown id="dropdown-dropup" dropup :text="buttonName" :variant="buttonColor" class="m-2">
         <b-dropdown-item @click="dragMode">ドラッグモード</b-dropdown-item>
         <b-dropdown-item @click="penBlack">黒ペン</b-dropdown-item>
         <b-dropdown-item @click="penRed">赤ペン</b-dropdown-item>
@@ -68,11 +68,13 @@ export default class Board extends Vue {
   image: HTMLImageElement = new Image
   canvasMode: string = 'drag'
   buttonName: string = 'ドラッグモード'
+  buttonColor: string = 'secondary'
   isPaint: boolean = false
 
   dragMode () {
     this.canvasMode = 'drag'
     this.buttonName = 'ドラッグモード'
+    this.buttonColor = 'secondary'
   }
 
   change3_1 () {
@@ -104,6 +106,7 @@ export default class Board extends Vue {
     ctx.strokeStyle = '#000000';
     this.canvasMode = 'paint'
     this.buttonName = '黒ペン'
+    this.buttonColor = 'dark'
   }
   penRed () {
     const ctx = this.paintCanvasContext as CanvasRenderingContext2D
@@ -112,6 +115,7 @@ export default class Board extends Vue {
     this.setPen(5)
     this.canvasMode = 'paint'
     this.buttonName = '赤ペン'
+    this.buttonColor = 'danger'
   }
 
   penBlue () {
@@ -121,6 +125,7 @@ export default class Board extends Vue {
     this.setPen(5)
     this.canvasMode = 'paint'
     this.buttonName = '青ペン'
+    this.buttonColor = 'primary'
   }
 
   penGreen () {
@@ -130,12 +135,14 @@ export default class Board extends Vue {
     this.setPen(5)
     this.canvasMode = 'paint'
     this.buttonName = '緑ペン'
+    this.buttonColor = 'success'
   }
   eraser () {
     (this.paintCanvasContext as CanvasRenderingContext2D).globalCompositeOperation = 'destination-out'
     this.setPen(30)
     this.canvasMode = 'paint'
     this.buttonName = '消しゴム'
+    this.buttonColor = 'light'
   }
 
   clearPaint () {
