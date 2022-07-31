@@ -279,6 +279,7 @@ export default class Board extends Vue {
           this.objects.splice(i + 1, 1);
           this.dx = mouseX - this.objects[0][1]
           this.dy = mouseY - this.objects[0][2]
+          this.dummyCanvasContext?.clearRect(0,0,1920,3000)
           return
         } else {
           this.isDrag = false
@@ -349,7 +350,6 @@ export default class Board extends Vue {
   }
 
   updateDummyImage () {
-    this.dummyCanvasContext?.clearRect(0,0,1920,3000)
     this.drawBoardImage(this.dummyCanvasContext)
     this.drawObjects(this.dummyCanvasContext, false)
     this.dlLink!.href = this.dummyCanvas?.toDataURL() as string
@@ -360,6 +360,7 @@ export default class Board extends Vue {
     this.drawObjects(this.context)
     this.undoIndex += 1
     localStorage.setItem('undoIndex', this.undoIndex.toString())
+    this.dummyCanvasContext?.clearRect(0,0,1920,3000)
     this.updateDummyImage()
   }
 
