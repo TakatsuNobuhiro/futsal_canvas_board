@@ -30,7 +30,12 @@
         <b-dropdown-item @click="eraser">消しゴム</b-dropdown-item>
       </b-dropdown>
       <button class="btn btn-light" @click="clearPaint">クリア</button>
-      <button class="btn btn-primary" @click="change3_1">3-1</button>
+      <b-dropdown id="dropdown-dropup" dropup text="フォーメーション" variant="dark" class="m-2">
+        <b-dropdown-item @click="change3_1">ダイヤ(3-1)</b-dropdown-item>
+        <b-dropdown-item @click="change4_0">クワトロ(4-0)</b-dropdown-item>
+        <b-dropdown-item @click="change_pp">パワープレー</b-dropdown-item>
+        <b-dropdown-item @click="change_ck">コーナーキック</b-dropdown-item>
+      </b-dropdown>
     </div>
   </div>
 </template>
@@ -71,12 +76,6 @@ export default class Board extends Vue {
   buttonColor: string = 'secondary'
   isPaint: boolean = false
 
-  dragMode () {
-    this.canvasMode = 'drag'
-    this.buttonName = 'ドラッグモード'
-    this.buttonColor = 'secondary'
-  }
-
   change3_1 () {
     this.objects = [
       [1, 200, 435, '#ed230c'], [2, 500, 95, '#ed230c'], [3, 400, 435, '#ed230c'], [4, 540, 795, '#ed230c'], [5, 1300, 435, '#ed230c'],
@@ -84,12 +83,43 @@ export default class Board extends Vue {
       [0, 500, 435, '#09a1ff']
     ]
     this.drawObjects(this.context)
-    this.historyList.splice(0,this.undoIndex - 1)
-    this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
-    this.undoIndex = 1
-    localStorage.setItem('undoIndex', this.undoIndex.toString())
-    this.isDrag = false
-    localStorage.setItem('historyList', JSON.stringify(this.historyList))
+    this.resetHistory()
+  }
+
+  change4_0 () {
+    this.objects = [
+      [1, 200, 435, '#ed230c'], [2, 500, 95, '#ed230c'], [3, 400, 300, '#ed230c'], [4, 400, 570, '#ed230c'], [5, 500, 795, '#ed230c'],
+      [1, 1700, 435, '#09a1ff'], [2, 800, 95, '#09a1ff'], [3, 600, 335, '#09a1ff'], [4, 600, 535, '#09a1ff'], [5, 800, 800, '#09a1ff'],
+      [0, 450, 350, '#09a1ff']
+    ]
+    this.drawObjects(this.context)
+    this.resetHistory()
+  }
+
+  change_pp () {
+    this.objects = [
+      [1, 1100, 435, '#ed230c'], [2, 1700, 95, '#ed230c'], [3, 1300, 200, '#ed230c'], [4, 1300, 670, '#ed230c'], [5, 1700, 795, '#ed230c'],
+      [1, 1300, 435, '#09a1ff'], [2, 1550, 435, '#09a1ff'], [3, 1425, 335, '#09a1ff'], [4, 1425, 535, '#09a1ff'], [5, 1800, 435, '#09a1ff'],
+      [0, 1150, 435, '#09a1ff']
+    ]
+    this.drawObjects(this.context)
+    this.resetHistory()
+  }
+
+  change_ck () {
+    this.objects = [
+      [1, 1850, 25, '#ed230c'], [2, 1500, 300, '#ed230c'], [3, 1300, 435, '#ed230c'], [4, 1500, 500, '#ed230c'], [5, 200, 435, '#ed230c'],
+      [1, 1780, 250, '#09a1ff'], [2, 1550, 250, '#09a1ff'], [3, 1650, 335, '#09a1ff'], [4, 1650, 500, '#09a1ff'], [5, 1800, 420, '#09a1ff'],
+      [0, 1800, 50, '#09a1ff']
+    ]
+    this.drawObjects(this.context)
+    this.resetHistory()
+  }
+
+  dragMode () {
+    this.canvasMode = 'drag'
+    this.buttonName = 'ドラッグモード'
+    this.buttonColor = 'secondary'
   }
 
   setPen (lineWidth: number) {
@@ -300,12 +330,7 @@ export default class Board extends Vue {
 
   mouseUp() {
     if (this.isDrag) {
-      this.historyList.splice(0,this.undoIndex - 1)
-      this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
-      this.undoIndex = 1
-      localStorage.setItem('undoIndex', this.undoIndex.toString())
-      this.isDrag = false
-      localStorage.setItem('historyList', JSON.stringify(this.historyList))
+      this.resetHistory()
     }
     if (this.isPaint){
       this.paintCanvasContext?.closePath()
@@ -314,7 +339,17 @@ export default class Board extends Vue {
     this.updateDummyImage()
   }
 
+  resetHistory () {
+    this.historyList.splice(0,this.undoIndex - 1)
+    this.historyList.unshift(JSON.parse(JSON.stringify(this.objects)))
+    this.undoIndex = 1
+    localStorage.setItem('undoIndex', this.undoIndex.toString())
+    this.isDrag = false
+    localStorage.setItem('historyList', JSON.stringify(this.historyList))
+  }
+
   updateDummyImage () {
+    this.dummyCanvasContext?.clearRect(0,0,1920,3000)
     this.drawBoardImage(this.dummyCanvasContext)
     this.drawObjects(this.dummyCanvasContext, false)
     this.dlLink!.href = this.dummyCanvas?.toDataURL() as string
